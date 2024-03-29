@@ -1,11 +1,15 @@
-
-// eslint-disable-next-line react/prop-types
-function Guitar({data, addToCart}) {
+import type { Guitar } from "../types";
 
 
 
-  
-  // eslint-disable-next-line react/prop-types
+type GuitarProps = {
+  data: Guitar,
+  addToCart: (data: Guitar) => void
+}
+
+
+function Guitar({data, addToCart} : GuitarProps) {
+
   const {price, image, name,description} = data;
 
   return (
