@@ -1,53 +1,49 @@
-// eslint-disable-next-line no-unused-vars
-import "../src/index.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Guitar from "./components/Guitar";
-import { useCart } from "./hooks/useCart";
+import Guitar from "./components/Guitar"
+import Header from "./components/Header"
+import { useReducer, useEffect } from "react"
+import { cartReducer, initialState } from "./reducers/cart-reducer"
 
 
 function App() {
 
-  const {
-    removeFromCart,
-    incrementarCart, 
-    decrementarCart,
-    addToCart, 
-    cart, 
-    data, 
-    cleanCart,
-    isEmpity,
-    calcularTotal
-  } = useCart()
+  const [state, dispatch] = useReducer(cartReducer,initialState)
+
+
+  useEffect(() => {
+      localStorage.setItem('cart', JSON.stringify(state.cart))
+  }, [state.cart])
+
 
   return (
     <>
-      <Header
-      removeFromCart={removeFromCart}
-      cart={cart} 
-      incrementarCart={incrementarCart}
-      decrementarCart={decrementarCart}
-      cleanCart={cleanCart}
-      isEmpity={isEmpity}
-      calcularTotal={calcularTotal}
+      <Header 
+        cart={state.cart}
+        dispatch={dispatch}
       />
+      
       <main className="container-xl mt-5">
-        <h2 className="text-center">Nuestra Colección</h2>
-        <div className="row mt-5">
-          {data.map((data) => {
-            return (
-              <Guitar
-                key={data.id}
-                data={data}
-                addToCart={addToCart}
-              />
-            );
-          })}
-        </div>
+          <h2 className="text-center">Nuestra Colección</h2>
+
+          <div className="row mt-5">
+              {state.data.map((guitar) => (
+                  <Guitar 
+                    key={guitar.id}
+                    guitar={guitar}
+                    dispatch={dispatch}
+                  />
+              ))}
+              
+          </div>
       </main>
-      <Footer />
+
+
+      <footer className="bg-dark mt-5 py-5">
+          <div className="container-xl">
+              <p className="text-white text-center fs-4 mt-4 m-md-0">GuitarLA - Todos los derechos Reservados</p>
+          </div>
+      </footer>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
