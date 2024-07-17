@@ -9,6 +9,7 @@ export type ActivityActions =
 export type ActivityState = {
   activities: Activity[];
   activitiId: Activity["id"];
+  actionState: string
 };
 
 const localStorageActivities = (): Activity[] => {
@@ -19,12 +20,16 @@ const localStorageActivities = (): Activity[] => {
 export const initialState: ActivityState = {
   activities: localStorageActivities(),
   activitiId: "",
+  actionState: ''
 };
+
+
+
 
 export const activityReducer = (
   state: ActivityState = initialState,
   action: ActivityActions
-) => {
+): ActivityState  => {
   if (action.type === "save-activity") {
     //Este codigo maneja logica
     let updateActivities: Activity[] = [];
@@ -46,15 +51,21 @@ export const activityReducer = (
     return {
       ...state,
       activitiId: action.payload.id,
+      actionState: action.type
     };
   }
 
   if (action.type === "delete-activitiId") {
+    
     return {
       ...state,
       activities: state.activities.filter(
         (item) => item.id !== action.payload.id
       ),
+      activitiId: '',
+      actionState: action.type
+
+      
     };
   }
 
@@ -62,7 +73,8 @@ export const activityReducer = (
   if(action.type === 'restar-app'){
     return{
       activities:[],
-      activeID: ""
+      activitiId: "",
+      actionState: ''
     }
   }
 

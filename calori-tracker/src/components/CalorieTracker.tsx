@@ -1,34 +1,14 @@
-import { useMemo } from "react";
-import { Activity } from "../types";
 import CaloryDisplay from "./CaloryDisplay";
+import useCalory from "../hooks/useCalory";
 
-type CalorieTrackerProps = {
-  activities: Activity[];
-};
 
-function CalorieTracker({ activities }: CalorieTrackerProps) {
-  //Contadores
-  const CaloriesConsumed = useMemo(
-    () =>
-      activities.reduce(
-        (total, activity) =>
-          activity.category === 1 ? total + +activity.calorias : total,
-        0
-      ),
-    [activities]
-  );
 
-  const CaloriesBurned = useMemo(
-    () =>
-      activities.reduce(
-        (total, activity) =>
-          activity.category === 2 ? total + +activity.calorias : total,
-        0
-      ),
-    [activities]
-  );
+function CalorieTracker() {
 
-  const caloriesTotal = useMemo(()=> CaloriesConsumed - CaloriesBurned , [activities])
+  const { caloriesTotal, CaloriesConsumed, CaloriesBurned} = useCalory()
+
+  
+
 
   return (
     <>

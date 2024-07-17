@@ -1,14 +1,11 @@
 import {v4 as uuidv4} from 'uuid'
 
 import { categories } from "../data/categories";
-import { ActivityActions, ActivityState } from "../reducers/activity-Reducer";
 import { Activity, type category } from "../types";
-import { ChangeEvent, useState, Dispatch, useEffect } from "react";
+import { ChangeEvent, useState,  useEffect } from "react";
+import useCalory from '../hooks/useCalory';
 
-type FormProps = {
-  dispatch: Dispatch<ActivityActions>;
-  state: ActivityState
-};
+
 
 const initialState = {   
    id: uuidv4(),
@@ -18,16 +15,26 @@ const initialState = {
 
 }
 
-function Form({ dispatch, state }: FormProps) {
+
+function Form() {
+  const {state, dispatch} = useCalory()
   const [activity, setActivity] = useState<Activity>(initialState);
   useEffect(() => {
-    console.log(state.activitiId)
-    if(state.activitiId){
-      const updateState = state.activities.filter((item) => item.id === state.activitiId)[0]
-      setActivity(updateState)
+
+    if(state.actionState === "delete-activitiId"){
+      setActivity(initialState)
+      state.actionState = ''
     }
 
-    return console.log("No hay nada")
+    if(state.actionState === "set-activitiId"){
+      if(state.activitiId){
+        const updateState = state.activities.filter((item) => item.id === state.activitiId)[0]
+        setActivity(updateState)
+      }
+    }
+    
+
+    return 
   }, [state.activitiId])
 
   const handelChange = (
@@ -42,14 +49,15 @@ function Form({ dispatch, state }: FormProps) {
 
   const isValidActivity = () => {
     const { name, calorias } = activity;
-    console.log();
     return name.trim() !== "" && calorias > 0;
   };
 
   const handelSubmit = (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
 
     dispatch({ type: "save-activity", payload: { newActivity: activity } });
+
 
     setActivity({
       ...initialState,

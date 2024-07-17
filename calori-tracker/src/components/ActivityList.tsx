@@ -1,15 +1,14 @@
-import { useMemo, Dispatch } from "react";
+import { useMemo } from "react";
 import { categories } from "../data/categories";
 import { Activity } from "../types";
 import { PencilSquareIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import { ActivityActions } from "../reducers/activity-Reducer";
+import useCalory from "../hooks/useCalory";
 
-type ActivityListProps = {
-  state: Activity[];
-  dispatch: Dispatch<ActivityActions>;
-};
 
-function ActivityList({ state, dispatch }: ActivityListProps) {
+
+function ActivityList() {
+const {state, dispatch} = useCalory()
+
   const categoriName = useMemo(
     () => (categoria: Activity["category"]) =>
       categories.map((cat) => (cat.id === categoria ? cat.name : "")),
@@ -22,8 +21,8 @@ function ActivityList({ state, dispatch }: ActivityListProps) {
         Comida y Actividades
       </h2>
 
-      {state.length > 0 ? (
-        state.map((item: Activity) => (
+      {state.activities.length > 0 ? (
+        state.activities.map((item: Activity) => (
           <div
             key={item.id}
             className="px-5 py-10 bg-white mt-5 flex justify-between"
