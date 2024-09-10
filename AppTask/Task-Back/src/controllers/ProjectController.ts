@@ -31,6 +31,12 @@ export class ProjectController {
 
     static createProject = async (req: Request, res: Response) => {
         const project = new Project(req.body)
+
+        if (!project) {
+            const error = new Error('Error al crear Proyecto')
+            return res.status(404).json({ error: error.message })
+        }
+        
         try {
             await project.save()
             res.send('Projecto Creado correctamente')
@@ -38,7 +44,6 @@ export class ProjectController {
             console.log(error)
         }
     }
-
 
 
 
