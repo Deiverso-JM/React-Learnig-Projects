@@ -1,3 +1,4 @@
+import authRoutes from './routes/authRoutes';
 import cors from 'cors'
 import dotenv from "dotenv"
 import express from "express";
@@ -23,6 +24,8 @@ app.use(express.json())
 
 //Routes
 app.use('/api/projects', projectRoutes)
+app.use('/api/auth', authRoutes)
+
 
 export default app
 

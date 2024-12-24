@@ -1,9 +1,10 @@
 import api from "@/lib/axios";
 import { isAxiosError } from "axios";
-import { dashboardProjectSchema, ProjectFormData } from "@/types/index";
+import { dashboardProjectSchema, Project, ProjectFormData } from "@/types/index";
+import { ProjectAPIType } from "@/types/generalTypes";
+
 
 export async function createProject(dataForm: ProjectFormData) {
-    console.log(dataForm)
     try {
         const response = await api.post('/projects/', dataForm)
         const { data } = response
@@ -20,6 +21,42 @@ export async function getAllProjects() {
         const response = await api.get('/projects/')
         const validateShema = dashboardProjectSchema.safeParse(response.data)
         if(validateShema.success) return validateShema.data
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+
+export async function getProyectById(id: Project['_id']) {
+    try {
+        const { data } = await api(`/projects/${id}`)
+        return data
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+
+export async function updateProject({ projectId, data}: ProjectAPIType) {
+    try {
+        const response = await api.put(`/projects/${projectId}`, data)
+        return response.data
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error)
+        }
+    }
+}
+
+
+export async function deleteProject(id: Project['_id']) {
+    try {
+        const { data } = await api.delete(`/projects/${id}`)
+        return data
     } catch (error) {
         if (isAxiosError(error) && error.response) {
             throw new Error(error.response.data.error)

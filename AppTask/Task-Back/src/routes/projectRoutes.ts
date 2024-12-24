@@ -78,10 +78,12 @@ router.param('taskId', taskBelongsToProject)
 
 
 router.get('/:projectId/tasks/:taskId', 
-    param('taskId')
-    .isMongoId().withMessage('Id no valido o no existente'),
+    param('taskId').isMongoId().withMessage('Id no válido o no existente'),
+    taskExist,  
+    taskBelongsToProject,  
     TaskController.getTaskProjectById
-)
+);
+
 
 router.put('/:projectId/tasks/:taskId', 
     param('taskId')
@@ -99,7 +101,7 @@ router.delete('/:projectId/tasks/:taskId',
     TaskController.deleteTaskProjectById
 )
 
-router.post('/:projectId/tasks/:taskId/status',
+router.put('/:projectId/tasks/:taskId/status',
     param('taskId')
     .isMongoId().withMessage('Id no valido o no existente'),
     body('status')

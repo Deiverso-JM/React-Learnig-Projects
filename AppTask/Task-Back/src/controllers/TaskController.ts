@@ -31,18 +31,20 @@ export class TaskController {
         }
     }
 
-
     static getTaskProjectById = async (req: Request, res: Response) => {
         try {
-            if (req.task.project.toString() !== req.project.id.toString()) return res.status(400).json({ error: new Error('La tarea no pertence a este proyecto').message })
-            return res.status(202).json(req.task)
+            if (req.task.project.toString() !== req.project.id.toString()) {
+                return res.status(400).json({ error: 'La tarea no pertenece a este proyecto' });
+            }
+
+            return res.status(202).json(req.task);
         } catch (error) {
-            res.status(500).json({ error: 'hubo un error' })
+            return res.status(500).json({ error: 'Hubo un error' });
         }
     }
 
-
     static updateTaskProjectById = async (req: Request, res: Response) => {
+        console.log(req.body)
         try {
             req.task.name = req.body.name
             req.task.description = req.body.description
@@ -66,12 +68,11 @@ export class TaskController {
 
     static updateStatusTask = async (req: Request, res: Response) => {
         try {
-            const { status } = req.body
-            req.task.status = status
+            req.task.status = req.body.status
             await req.task.save()
-            return res.json('status de la tarea actualizado correctamente')
+            res.send("Tarea Actualizada Correctamente")
         } catch (error) {
-            res.status(500).json({ error: 'hubo un error' })
+            res.status(500).json({error: 'Hubo un error'})
         }
     }
 

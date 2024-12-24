@@ -8,14 +8,41 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import { getAllProjects } from "@/api/ProjectAPI";
-import { useQuery } from "@tanstack/react-query";
+import { deleteProject, getAllProjects } from "@/api/ProjectAPI";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Bounce, toast } from "react-toastify";
 
 function DashboardView() {
   const { data, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: getAllProjects,
   });
+
+  const queryCliente = useQueryClient()
+
+
+  const {mutate} =  useMutation({
+    mutationFn: deleteProject,
+     onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: (dataResponse) => {
+      queryCliente.invalidateQueries({queryKey: ['projects']})
+      toast.success(dataResponse, {
+       autoClose: 5000,
+       closeOnClick: true,
+       draggable: true,
+       hideProgressBar: false,
+       pauseOnHover: true,
+       position: "top-right",
+       progress: undefined,
+       theme: "light",
+       transition: Bounce,
+     });
+    }
+  })
+
+
 
   if (isLoading) return "Cargando...";
 
@@ -49,7 +76,7 @@ function DashboardView() {
                 <div className="flex min-w-0 gap-x-4">
                   <div className="min-w-0 flex-auto space-y-2">
                     <Link
-                      to={``}
+                      to={`/projects/${project._id}`}
                       className="text-gray-600 cursor-pointer hover:underline text-3xl font-bold"
                     >
                       {project.projectName}
@@ -83,7 +110,7 @@ function DashboardView() {
                       <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                         <MenuItem>
                           <Link
-                            to={``}
+                            to={`/projects/${project._id}`}
                             className="block px-3 py-1 text-sm leading-6 text-gray-900"
                           >
                             Ver Proyecto
@@ -91,7 +118,7 @@ function DashboardView() {
                         </MenuItem>
                         <MenuItem>
                           <Link
-                            to={``}
+                            to={`/projects/${project._id}/edit`}
                             className="block px-3 py-1 text-sm leading-6 text-gray-900"
                           >
                             Editar Proyecto
@@ -101,7 +128,7 @@ function DashboardView() {
                           <button
                             type="button"
                             className="block px-3 py-1 text-sm leading-6 text-red-500"
-                            onClick={() => {}}
+                            onClick={() => {mutate(project._id)}}
                           >
                             Eliminar Proyecto
                           </button>
