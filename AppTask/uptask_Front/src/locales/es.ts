@@ -1,7 +1,7 @@
-import { Task } from "../types";
+import { TaskProject } from "../types";
 
 type GroupTask = {
-    [key: string]: Task[];
+    [key: string]: TaskProject[];
 };
 
 

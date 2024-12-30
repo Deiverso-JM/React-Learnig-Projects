@@ -2,9 +2,10 @@ import { Link } from "react-router-dom";
 import { PinInput, PinInputField } from "@chakra-ui/pin-input";
 import { useState } from "react";
 import { ConfirmToken } from "@/types/index";
-import { Bounce, toast } from "react-toastify";
+import { toast, ToastOptions } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import { confirmToken } from "@/api/AuthApi";
+import { toasSuccesFormat } from "@/utils/utils";
 
 export default function ConfirmAccountView() {
   const [token, setToken] = useState<ConfirmToken['token']>();
@@ -17,17 +18,7 @@ export default function ConfirmAccountView() {
       toast.error(error.message);
     },
     onSuccess: (dataResponse) => {
-      toast.success(dataResponse, {
-        autoClose: 5000,
-        closeOnClick: true,
-        draggable: true,
-        hideProgressBar: false,
-        pauseOnHover: true,
-        position: "top-right",
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.success(dataResponse, toasSuccesFormat as ToastOptions);
 
     },
   });

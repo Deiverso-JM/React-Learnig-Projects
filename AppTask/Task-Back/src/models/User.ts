@@ -11,17 +11,17 @@ export interface IUSer extends Document {
 const userShema: Schema = new Schema({
     email: {
         type: String,
-        require: true,
+        required: true,
         lowercase: true,
         unique: true
     },
     name: {
         type: String,
-        require: true,
+        required: true,
     },
     password: {
         type: String,
-        require: true,
+        required: true,
     },
     confirmed: {
         type: Boolean,

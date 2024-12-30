@@ -1,5 +1,5 @@
 import type {Request, NextFunction , Response } from 'express'
-import Project, { IProject } from '../models/Project'
+import Project, { IProject } from '../models/project'
 
 declare global{
     namespace Express{
@@ -21,7 +21,7 @@ export async function projectExist(req: Request, res: Response, next: NextFuncti
         req.project = projectExist
         next()
     }catch(error) {
-        console.log(error)
+        return res.status(500).json({ error: 'Hubo un error' });
     }
 
 }

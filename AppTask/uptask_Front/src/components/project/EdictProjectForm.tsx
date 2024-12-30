@@ -1,12 +1,11 @@
 import ProjectForm from "@/components/project/ProjectForm";
-import { Bounce, toast } from "react-toastify";
+import { toast, ToastOptions } from "react-toastify";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ProjectFormData } from "@/types/index";
 import { updateProject } from "@/api/ProjectAPI";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-
+import { toasSuccesFormat } from "@/utils/utils";
 
 function EditProjectForm({ projectFound }: { projectFound: ProjectFormData }) {
   const navigate = useNavigate();
@@ -25,26 +24,16 @@ function EditProjectForm({ projectFound }: { projectFound: ProjectFormData }) {
     },
   });
 
-  const queryCliente = useQueryClient()
+  const queryCliente = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: updateProject,
     onError: (error) => {
       toast.error(error.message);
     },
     onSuccess: (dataResponse) => {
-       queryCliente.invalidateQueries({queryKey: ['projects']}) 
-       queryCliente.invalidateQueries({queryKey: ['editProject', projectId]}) 
-       toast.success(dataResponse, {
-        autoClose: 5000,
-        closeOnClick: true,
-        draggable: true,
-        hideProgressBar: false,
-        pauseOnHover: true,
-        position: "top-right",
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      queryCliente.invalidateQueries({ queryKey: ["projects"] });
+      queryCliente.invalidateQueries({ queryKey: ["editProject", projectId] });
+      toast.success(dataResponse, toasSuccesFormat as ToastOptions);
       navigate("/");
     },
   });

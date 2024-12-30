@@ -4,7 +4,8 @@ import ErrorMessage from "@/components/ErrorMessage";
 import { Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { createAccount } from "@/api/AuthApi";
-import { Bounce, toast } from "react-toastify";
+import { toast, ToastOptions } from "react-toastify";
+import { toasSuccesFormat } from "@/utils/utils";
 
 export default function RegisterView() {
   const initialValues: UserRegistrationForm = {
@@ -30,17 +31,7 @@ export default function RegisterView() {
       toast.error(error.message);
     },
     onSuccess: (dataResponse) => {
-      toast.success(dataResponse, {
-        autoClose: 5000,
-        closeOnClick: true,
-        draggable: true,
-        hideProgressBar: false,
-        pauseOnHover: true,
-        position: "top-right",
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.success(dataResponse, toasSuccesFormat as ToastOptions);
       reset()
     },
   });
@@ -147,6 +138,12 @@ export default function RegisterView() {
           to={"/auth/login"}
         >
           Tienes cuenta, inicia sesion
+        </Link>
+        <Link
+          className="text-center text-gray-300 font-normal"
+          to={"/auth/new-password"}
+        >
+          Olvidaste tu password, recuperala aqui
         </Link>
       </nav>
     </>

@@ -10,7 +10,7 @@ export interface IToken extends Document {
 const tokenShema: Schema = new Schema({
     token: {
         type: String,
-        require: true,
+        required: true,
     },
     user: {
         type: String,

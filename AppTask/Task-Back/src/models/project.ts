@@ -1,27 +1,31 @@
-import mongoose, {Schema, Document, PopulatedDoc} from "mongoose";
+import mongoose, { Schema, Document, PopulatedDoc, Types } from "mongoose";
 import { ITask, Task } from "./Task";
+import { IUSer } from "./User";
+import Note from "./Note";
 
 export interface IProject extends Document {
     projectName: string
-    clientName: string 
-    description: string 
+    clientName: string
+    description: string
     tasks: PopulatedDoc<ITask & Document>[]
+    manager: PopulatedDoc<IUSer & Document>
+    team: PopulatedDoc<IUSer & Document>[]
 }
 
-const ProjectSchema:Schema = new Schema({
+const ProjectSchema: Schema = new Schema({
     projectName: {
         type: String,
-        require: true,
+        required: true,
         trim: true
     },
     clientName: {
         type: String,
-        require: true,
+        required: true,
         trim: true
     },
     description: {
         type: String,
-        require: true,
+        required: true,
         trim: true
     },
     tasks: [
@@ -29,9 +33,31 @@ const ProjectSchema:Schema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Task'
         }
+    ],
+    manager: {
+        type: Types.ObjectId,
+        ref: 'User'
+    },
+    team: [
+        {
+            type: Types.ObjectId,
+            ref: 'User'
+        }
     ]
 
-}, {timestamps: true})
+}, { timestamps: true })
+
+//middleware 
+
+ProjectSchema.pre('deleteOne', { document: true, query: false }, async function () {
+    const projectId = this._id
+    if (!projectId) return
+    const tasks = await Task.find( {project: projectId})
+    for(const task of tasks){
+        await Note.deleteMany({task: task.id})
+    }
+    await Task.deleteMany({ project: projectId })
+})
 
 const Project = mongoose.model<IProject>('Project', ProjectSchema)
 export default Project

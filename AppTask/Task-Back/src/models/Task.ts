@@ -1,4 +1,5 @@
-import mongoose, {Schema, Document, Types} from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
+import Note from "./Note";
 
 
 const taskStatus = {
@@ -7,26 +8,31 @@ const taskStatus = {
     IN_PROGRESS: 'inProgress',
     UNDER_REVIEW: 'underReview',
     COMPLETED: 'completed'
-} as const 
+} as const
 
-export type TaskStastus = typeof taskStatus[keyof  typeof taskStatus]
+export type TaskStastus = typeof taskStatus[keyof typeof taskStatus]
 
-export interface ITask extends Document{
-    name: string 
-    description: string
-    project: Types.ObjectId
-    status: TaskStastus
+export interface ITask extends Document {
+    name: string;
+    description: string;
+    project: Types.ObjectId;
+    status: TaskStastus;
+    completedBy: {
+        user: Types.ObjectId,
+        status: TaskStastus
+    }[];
+    notes: Types.ObjectId[]
 }
 
-const TaskSchema:Schema = new Schema({
-    name: { 
+const TaskSchema: Schema = new Schema({
+    name: {
         type: String,
-        require: true,
+        required: true,
         trim: true
     },
     description: {
         type: String,
-        require: true,
+        required: true,
         trim: true
     },
     project: {
@@ -37,8 +43,36 @@ const TaskSchema:Schema = new Schema({
         type: String,
         enum: Object.values(taskStatus),
         default: taskStatus.PENDING
+    },
+    completedBy: [
+        {
+            user: {
+                type: Types.ObjectId,
+                ref: 'User',
+                default: null
+            },
+            status: {
+                type: String,
+                enum: Object.values(taskStatus),
+                default: taskStatus.PENDING
+            }
+        }
+    ],
+    notes: [
+        {
+            type: Types.ObjectId,
+            ref: 'Note'
+        }
+    ]
 
-    }
-},{timestamps: true})
+}, { timestamps: true })
+
+//Midleware
+
+TaskSchema.pre('deleteOne', { document: true, query: false }, async function () {
+    const taskId = this._id
+    if (!taskId) return
+    await Note.deleteMany({ task: taskId })
+})
 
 export const Task = mongoose.model<ITask>('Task', TaskSchema)

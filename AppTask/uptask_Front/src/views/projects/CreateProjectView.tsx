@@ -1,10 +1,11 @@
 import ProjectForm from "@/components/project/ProjectForm";
-import { Bounce, toast } from "react-toastify";
+import { toast, ToastOptions } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { ProjectFormData } from "@/types/index";
 import { createProject } from "@/api/ProjectAPI";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
+import { toasSuccesFormat } from "@/utils/utils";
 
 function CreateProjectView() {
   const navigate = useNavigate();
@@ -23,20 +24,10 @@ function CreateProjectView() {
   const { mutate } = useMutation({
     mutationFn: createProject,
     onError: (error) => {
-      toast.error(error.message)
+      toast.error(error.message);
     },
     onSuccess: (dataResponse) => {
-      toast.success(dataResponse, {
-        autoClose: 5000,
-        closeOnClick: true,
-        draggable: true,
-        hideProgressBar: false,
-        pauseOnHover: true,
-        position: "top-right",
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.success(dataResponse, toasSuccesFormat as ToastOptions);
       navigate("/");
     },
   });

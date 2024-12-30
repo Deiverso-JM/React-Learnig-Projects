@@ -19,9 +19,8 @@ export async function taskExist(req: Request, res: Response, next: NextFunction)
     }
 
     req.task = task;
-    next();  
+    next();
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: 'Error en el servidor' });
   }
 }
@@ -33,9 +32,22 @@ export async function taskBelongsToProject(req: Request, res: Response, next: Ne
       return res.status(400).json({ error: 'La tarea no pertenece a este proyecto' });
     }
 
-    next();  
+    next();
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ error: 'Error en el servidor' });
+  }
+}
+
+
+
+export async function hasAutorization(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (req.user.id.toString() !== req.project.manager.toString()) {
+      return res.status(400).json({ error: 'Accion no valida' });
+    }
+
+    next();
+  } catch (error) {
     return res.status(500).json({ error: 'Error en el servidor' });
   }
 }

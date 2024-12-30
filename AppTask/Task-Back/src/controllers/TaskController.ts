@@ -15,7 +15,7 @@ export class TaskController {
             return res.status(202).json('Tarea creada correctamente')
 
         } catch (error) {
-            console.log(error)
+            res.status(500).json({ error: 'hubo un error' })
         }
     }
 
@@ -37,14 +37,21 @@ export class TaskController {
                 return res.status(400).json({ error: 'La tarea no pertenece a este proyecto' });
             }
 
-            return res.status(202).json(req.task);
+            const task = await Task.findById(req.task.id).populate({
+                path: 'completedBy.user',
+                select: 'id name email'
+            }).populate({
+                path: 'notes',
+                populate: { path: 'createdBy', select: 'id name email' }
+            })
+
+            return res.status(202).json(task);
         } catch (error) {
             return res.status(500).json({ error: 'Hubo un error' });
         }
     }
 
     static updateTaskProjectById = async (req: Request, res: Response) => {
-        console.log(req.body)
         try {
             req.task.name = req.body.name
             req.task.description = req.body.description
@@ -68,11 +75,17 @@ export class TaskController {
 
     static updateStatusTask = async (req: Request, res: Response) => {
         try {
-            req.task.status = req.body.status
+            const { status } = req.body
+            req.task.status = status
+            const data = {
+                user: req.user.id,
+                status
+            }
+            req.task.completedBy.push(data)
             await req.task.save()
             res.send("Tarea Actualizada Correctamente")
         } catch (error) {
-            res.status(500).json({error: 'Hubo un error'})
+            res.status(500).json({ error: 'Hubo un error' })
         }
     }
 

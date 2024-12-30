@@ -1,17 +1,24 @@
 import { deleteTaskById } from "@/api/TaskApi";
-import { Task } from "@/types/index";
+import { TaskProject } from "@/types/index";
+import { toasSuccesFormat } from "@/utils/utils";
 import { Menu, Transition } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/16/solid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { Bounce, toast } from "react-toastify";
+import { toast, ToastOptions } from "react-toastify";
 import { Fragment } from "react/jsx-runtime";
+import { useDraggable } from "@dnd-kit/core";
 
 type TaskCardProps = {
-  task: Task;
+  task: TaskProject;
+  canEdit: boolean;
 };
 
-export default function TaskCard({ task }: TaskCardProps) {
+export default function TaskCard({ task, canEdit }: TaskCardProps) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: task._id,
+  });
+
   const navigate = useNavigate();
   const params = useParams();
   const projectId = params.ProjectId!;
@@ -25,26 +32,37 @@ export default function TaskCard({ task }: TaskCardProps) {
     },
     onSuccess: (dataResponse: string) => {
       queryCliente.invalidateQueries({ queryKey: ["editProject", projectId] });
-      toast.success(dataResponse, {
-        autoClose: 5000,
-        closeOnClick: true,
-        draggable: true,
-        hideProgressBar: false,
-        pauseOnHover: true,
-        position: "top-right",
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.success(dataResponse, toasSuccesFormat as ToastOptions);
     },
   });
 
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        padding: "1.25rem",
+        backgroundColor: "#FFF",
+        width: "300px",
+        display: "flex",
+        borderWith: "1px",
+        borderColor: "rgb(203 213 225 / var(--tw-border-opacity))",
+      }
+    : undefined;
+
   return (
-    <li className="p-5 bg-white border border-slate-300 flex justify-between gap-3">
-      <div className="min-w-0 float-right flex-col gap-y-4">
+    <li
+      {...listeners}
+      {...attributes}
+      ref={setNodeRef}
+      style={style}
+      className="p-5 bg-white border border-slate-300 flex justify-between gap-3"
+    >
+      <div className="min-w-0 flex flex-col gap-y-4">
         <button
           type="button"
           className="text-xl font-bold text-slate-600 text-left"
+          onClick={() => {
+            navigate(location.pathname + `?viewTaskId=${task._id}`);
+          }}
         >
           {task.name}
         </button>
@@ -77,27 +95,30 @@ export default function TaskCard({ task }: TaskCardProps) {
                   Ver Tarea
                 </button>
               </Menu.Item>
-              <Menu.Item>
-                <button
-                  type="button"
-                  className="block px-3 py-1 text-sm leading-6 text-gray-900"
-                  onClick={() => {
-                    navigate(location.pathname + `?EditTaskId=${task._id}`);
-                  }}
-                >
-                  Editar Tarea
-                </button>
-              </Menu.Item>
-
-              <Menu.Item>
-                <button
-                  type="button"
-                  className="block px-3 py-1 text-sm leading-6 text-red-500"
-                  onClick={() => mutate({ projectId, taskId: task._id })}
-                >
-                  Eliminar Tarea
-                </button>
-              </Menu.Item>
+              {canEdit && (
+                <>
+                  <Menu.Item>
+                    <button
+                      type="button"
+                      className="block px-3 py-1 text-sm leading-6 text-gray-900"
+                      onClick={() => {
+                        navigate(location.pathname + `?EditTaskId=${task._id}`);
+                      }}
+                    >
+                      Editar Tarea
+                    </button>
+                  </Menu.Item>
+                  <Menu.Item>
+                    <button
+                      type="button"
+                      className="block px-3 py-1 text-sm leading-6 text-red-500"
+                      onClick={() => mutate({ projectId, taskId: task._id })}
+                    >
+                      Eliminar Tarea
+                    </button>
+                  </Menu.Item>
+                </>
+              )}
             </Menu.Items>
           </Transition>
         </Menu>

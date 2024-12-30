@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTask } from "@/api/TaskApi";
-import { Bounce, toast } from "react-toastify";
+import { toast, ToastOptions } from "react-toastify";
+import { toasSuccesFormat } from "@/utils/utils";
 
 export default function AddTaskModal() {
   const navigate = useNavigate();
@@ -37,17 +38,7 @@ export default function AddTaskModal() {
     },
     onSuccess: (dataResponse) => {
       queryCliente.invalidateQueries({ queryKey: ["editProject", projectId] });
-      toast.success(dataResponse, {
-        autoClose: 5000,
-        closeOnClick: true,
-        draggable: true,
-        hideProgressBar: false,
-        pauseOnHover: true,
-        position: "top-right",
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.success(dataResponse, toasSuccesFormat as ToastOptions);
       reset();
       navigate(location.pathname, { replace: true });
     },
